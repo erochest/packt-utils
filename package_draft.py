@@ -84,7 +84,7 @@ class DraftPackager:
                 self.code_dir, '{}code.zip'.format(self.prefix),
                 )
 
-        with zipfile.ZipFile(zip_filename, 'w') as zf:
+        with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zf:
             for (root, dirs, files) in os.walk(full_chapter_dir):
                 zip_root = root.replace(full_chapter_dir, self.args.chapter_dir)
                 for fn in files:
@@ -93,7 +93,7 @@ class DraftPackager:
         ls_zip('CODE ZIP:', zip_filename)
 
     def package(self):
-        with zipfile.ZipFile(self.zip_file, 'w') as zf:
+        with zipfile.ZipFile(self.zip_file, 'w', zipfile.ZIP_DEFLATED) as zf:
             zf.write(self.word_draft, os.path.basename(self.word_draft))
             self.__package_dir(zf, self.img_dir, '*.png')
             self.__package_dir(zf, self.code_dir, '*.zip')
