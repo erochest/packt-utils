@@ -29,16 +29,16 @@ class DraftPackager:
     def __init__(self, args):
         self.args = args
         self.prefix = '{}_{:02}_'.format(args.isbn, args.chapter)
-        self.draft_dir = os.path.join(
+        self.stage_dir = os.path.join(
                 self.BASEDIR,
-                'draft-{:02}'.format(args.draft),
+                'draft-{:02}'.format(args.stage),
                 )
         self.img_dir = os.path.join(
-                self.draft_dir,
+                self.stage_dir,
                 '{}images'.format(self.prefix),
                 )
         self.code_dir = os.path.join(
-                self.draft_dir,
+                self.stage_dir,
                 '{}code'.format(self.prefix),
                 )
 
@@ -47,11 +47,11 @@ class DraftPackager:
         self.find_word_draft()
 
         self.basename = '{}{}Draft.zip'.format(self.prefix, self.args.ordinal)
-        self.zip_file = os.path.join(self.draft_dir, self.basename)
+        self.zip_file = os.path.join(self.stage_dir, self.basename)
 
     def find_word_draft(self):
         file_tries = [
-            os.path.join(self.draft_dir, '{}{}Draft.{}'.format(
+            os.path.join(self.stage_dir, '{}{}Draft.{}'.format(
                 self.prefix, self.args.ordinal, ext,
                 ))
             for ext in {'doc', 'docx'}
@@ -107,7 +107,7 @@ class DraftPackager:
         shutil.rmtree(self.tmp_dir, True)
 
     @staticmethod
-    def package_draft(args):
+    def package_stage(args):
         mover = DraftPackager(args)
         try:
             mover.zip_code()
@@ -131,19 +131,21 @@ def parse_args(argv=None):
     parser.add_argument('-i', '--isbn', dest='isbn', action='store',
                         default=ISBN, type=unicode,
                         help='The ISBN for the project (default={}).'.format(ISBN))
-    parser.add_argument('-d', '--draft', dest='draft', action='store',
+    parser.add_argument('-s', '--stage', dest='stage', action='store',
                         default=DRAFT, type=int,
-                        help='The draft (default={}).'.format(DRAFT))
+                        help='The stage (default={}).'.format(DRAFT))
     parser.add_argument('-o', '--ordinal', dest='ordinal', action='store',
                         default=ORDINAL, type=unicode,
                         help='The draft (default={}).'.format(ORDINAL))
-    parser.add_argument('-c', '--chapter', dest='chapter', action='store', required=True, type=int,
+    parser.add_argument('-c', '--chapter', dest='chapter', action='store',
+                        required=True, type=int,
                         help='The chapter for the image.')
     parser.add_argument('-g', '--git-repo', dest='git_repo', action='store',
                         required=True, type=unicode,
                         help='The git repo to clone for the code.')
     parser.add_argument('-C', '--chapter-dir', dest='chapter_dir', action='store',
-                        required=False, type=unicode, default=os.path.basename(os.getcwdu()),
+                        required=False, type=unicode,
+                        default=os.path.basename(os.getcwdu()),
                         help='The chapter directory inside the git repo to zip up '
                              '(default={}).'.format(os.path.basename(os.getcwdu())))
 
@@ -152,4 +154,4 @@ def parse_args(argv=None):
 
 
 if __name__ == '__main__':
-    DraftPackager.package_draft(parse_args())
+    DraftPackager.package_stage(parse_args())
