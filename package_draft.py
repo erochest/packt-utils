@@ -18,29 +18,29 @@ import tempfile
 import zipfile
 
 
-ISBN    = '4139OS'
-DRAFT   = 1
+ISBN = '0297OS'
+DRAFT = 1
 ORDINAL = '1st'
 
 
 class DraftPackager:
-    BASEDIR = os.path.expanduser('~/Dropbox/clj-data')
+    BASEDIR = os.path.expanduser('~/Dropbox/packt')
 
     def __init__(self, args):
         self.args = args
         self.prefix = '{}_{:02}_'.format(args.isbn, args.chapter)
         self.stage_dir = os.path.join(
-                self.BASEDIR,
-                'draft-{:02}'.format(args.stage),
-                )
+            self.BASEDIR,
+            'draft-{:02}'.format(args.stage),
+            )
         self.img_dir = os.path.join(
-                self.stage_dir,
-                '{}images'.format(self.prefix),
-                )
+            self.stage_dir,
+            '{}images'.format(self.prefix),
+            )
         self.code_dir = os.path.join(
-                self.stage_dir,
-                '{}code'.format(self.prefix),
-                )
+            self.stage_dir,
+            '{}code'.format(self.prefix),
+            )
 
         self.tmp_dir = tempfile.mkdtemp()
 
@@ -76,19 +76,23 @@ class DraftPackager:
         if retcode != 0:
             raise Exception('ERROR ON "{}"'.format(cmd))
         full_chapter_dir = os.path.join(
-                self.tmp_dir, self.args.isbn, self.args.chapter_dir,
-                )
+            self.tmp_dir, self.args.isbn, self.args.chapter_dir,
+            )
         if not os.path.exists(self.code_dir):
             os.makedirs(self.code_dir)
         zip_filename = os.path.join(
-                self.code_dir, '{}code.zip'.format(self.prefix),
-                )
+            self.code_dir, '{}code.zip'.format(self.prefix),
+            )
 
         with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zf:
             for (root, dirs, files) in os.walk(full_chapter_dir):
-                zip_root = root.replace(full_chapter_dir, self.args.chapter_dir)
+                zip_root = root.replace(
+                    full_chapter_dir, self.args.chapter_dir,
+                    )
                 for fn in files:
-                    zf.write(os.path.join(root, fn), os.path.join(zip_root, fn))
+                    zf.write(
+                        os.path.join(root, fn), os.path.join(zip_root, fn),
+                        )
 
         ls_zip('CODE ZIP:', zip_filename)
 
@@ -125,12 +129,13 @@ def ls_zip(title, zip_file):
 
 
 def parse_args(argv=None):
-    argv   = argv if argv is not None else sys.argv[1:]
+    argv = argv if argv is not None else sys.argv[1:]
     parser = argparse.ArgumentParser(description=__doc__)
 
     parser.add_argument('-i', '--isbn', dest='isbn', action='store',
                         default=ISBN, type=unicode,
-                        help='The ISBN for the project (default={}).'.format(ISBN))
+                        help='The ISBN for the project '
+                             '(default={}).'.format(ISBN))
     parser.add_argument('-s', '--stage', dest='stage', action='store',
                         default=DRAFT, type=int,
                         help='The stage (default={}).'.format(DRAFT))
@@ -143,11 +148,13 @@ def parse_args(argv=None):
     parser.add_argument('-g', '--git-repo', dest='git_repo', action='store',
                         required=True, type=unicode,
                         help='The git repo to clone for the code.')
-    parser.add_argument('-C', '--chapter-dir', dest='chapter_dir', action='store',
+    parser.add_argument('-C', '--chapter-dir', dest='chapter_dir',
+                        action='store',
                         required=False, type=unicode,
                         default=os.path.basename(os.getcwdu()),
-                        help='The chapter directory inside the git repo to zip up '
-                             '(default={}).'.format(os.path.basename(os.getcwdu())))
+                        help='The chapter directory inside the git repo to '
+                             'zip up (default={}).'.format(
+                                 os.path.basename(os.getcwdu())))
 
     args = parser.parse_args(argv)
     return args
