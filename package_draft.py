@@ -31,7 +31,8 @@ class DraftPackager:
         self.prefix = '{}_{:02}_'.format(args.isbn, args.chapter)
         self.stage_dir = os.path.join(
             self.BASEDIR,
-            'draft-{:02}'.format(args.stage),
+            args.isbn,
+            'ed{:02}.draft{:02}'.format(args.edition, args.stage),
             )
         self.img_dir = os.path.join(
             self.stage_dir,
@@ -136,6 +137,9 @@ def parse_args(argv=None):
                         default=ISBN, type=unicode,
                         help='The ISBN for the project '
                              '(default={}).'.format(ISBN))
+    parser.add_argument('-e', '--edition', dest='edition', action='store',
+                        default=2, type=int,
+                        help='The edition of this book (default=1).')
     parser.add_argument('-s', '--stage', dest='stage', action='store',
                         default=DRAFT, type=int,
                         help='The stage (default={}).'.format(DRAFT))
