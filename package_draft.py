@@ -17,31 +17,20 @@ import sys
 import tempfile
 import zipfile
 
+from packt import get_staging_dir, get_img_dir, get_code_dir, add_arguments
 
-ISBN = '0297OS'
-DRAFT = 1
+
 ORDINAL = '1st'
 
 
 class DraftPackager:
-    BASEDIR = os.path.expanduser('~/Dropbox/packt')
 
     def __init__(self, args):
         self.args = args
         self.prefix = '{}_{:02}_'.format(args.isbn, args.chapter)
-        self.stage_dir = os.path.join(
-            self.BASEDIR,
-            args.isbn,
-            'ed{:02}.draft{:02}'.format(args.edition, args.stage),
-            )
-        self.img_dir = os.path.join(
-            self.stage_dir,
-            '{}images'.format(self.prefix),
-            )
-        self.code_dir = os.path.join(
-            self.stage_dir,
-            '{}code'.format(self.prefix),
-            )
+        self.stage_dir = get_staging_dir(args)
+        self.img_dir = get_img_dir(self.stage_dir, self.prefix)
+        self.code_dir = get_code_dir(self.stage_dir, self.prefix)
 
         self.tmp_dir = tempfile.mkdtemp()
 
@@ -133,22 +122,11 @@ def parse_args(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
     parser = argparse.ArgumentParser(description=__doc__)
 
-    parser.add_argument('-i', '--isbn', dest='isbn', action='store',
-                        default=ISBN, type=unicode,
-                        help='The ISBN for the project '
-                             '(default={}).'.format(ISBN))
-    parser.add_argument('-e', '--edition', dest='edition', action='store',
-                        default=2, type=int,
-                        help='The edition of this book (default=1).')
-    parser.add_argument('-s', '--stage', dest='stage', action='store',
-                        default=DRAFT, type=int,
-                        help='The stage (default={}).'.format(DRAFT))
+    add_arguments(parser)
+
     parser.add_argument('-o', '--ordinal', dest='ordinal', action='store',
                         default=ORDINAL, type=unicode,
                         help='The draft (default={}).'.format(ORDINAL))
-    parser.add_argument('-c', '--chapter', dest='chapter', action='store',
-                        required=True, type=int,
-                        help='The chapter for the image.')
     parser.add_argument('-g', '--git-repo', dest='git_repo', action='store',
                         required=True, type=unicode,
                         help='The git repo to clone for the code.')
