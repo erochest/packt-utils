@@ -12,22 +12,15 @@ import os
 import shutil
 import sys
 
-
-ISBN = '0297OS'
-DRAFT = 1
+from packt import add_arguments, get_img_dir, get_staging_dir
 
 
 class FileMover:
-    BASEDIR = os.path.expanduser('~/Dropbox/clj-data')
 
     def __init__(self, args):
         self.args = args
         self.prefix = '{}_{:02}_'.format(args.isbn, args.chapter)
-        self.img_dir = os.path.join(
-            self.BASEDIR,
-            'draft-{:02}'.format(args.draft),
-            '{}images'.format(self.prefix),
-            )
+        self.img_dir = get_img_dir(get_staging_dir(args), self.prefix)
 
         self.set_n()
 
@@ -87,16 +80,8 @@ def parse_args(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
     parser = argparse.ArgumentParser(description=__doc__)
 
-    parser.add_argument('-i', '--isbn', dest='isbn', action='store',
-                        default=ISBN, type=str,
-                        help='The ISBN for the project '
-                             '(default={}).'.format(ISBN))
-    parser.add_argument('-d', '--draft', dest='draft', action='store',
-                        default=DRAFT, type=int,
-                        help='The draft (default={}).'.format(DRAFT))
-    parser.add_argument('-c', '--chapter', dest='chapter', action='store',
-                        required=True, type=int,
-                        help='The chapter for the image.')
+    add_arguments(parser)
+
     parser.add_argument('-n', dest='n', action='store', default=0, type=int,
                         help='The number (default is {}, or the next '
                              'available).'.format(0))
