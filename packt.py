@@ -1,6 +1,7 @@
 
 
 import os
+import sys
 
 
 BASEDIR = os.path.expanduser('~/Dropbox/packt')
@@ -28,9 +29,15 @@ def get_code_dir(staging_dir, prefix):
     return get_data_dir(staging_dir, prefix, 'code')
 
 
+if sys.version_info.major >= 3:
+    str_type = str
+else:
+    str_type = unicode
+
+
 def add_arguments(parser):
     parser.add_argument('-i', '--isbn', dest='isbn', action='store',
-                        default=ISBN, type=unicode,
+                        default=ISBN, type=str_type,
                         help='The ISBN for the project '
                              '(default={}).'.format(ISBN))
     parser.add_argument('-e', '--edition', dest='edition', action='store',
