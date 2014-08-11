@@ -69,6 +69,7 @@ def rename_images(args):
 def bye(args):
     print("Please re-save the chapter file as a DOCX and check that the "
           "formatting hasn't been wiped out.")
+    print("Also, delete all comments and accept all revisions.")
 
 
 def parse_args(argv=None):
