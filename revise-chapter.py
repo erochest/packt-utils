@@ -52,16 +52,23 @@ def copy_images(args):
             'No previous image directory found in {}.'.format(args.images),
             )
 
-    dest = get_img_dir(args)
+    staging = get_staging_dir(args)
+    dest = get_img_dir(staging, '{}_{:02}_'.format(args.isbn, args.chapter))
 
     print('cp -r {} {}'.format(srcs[0], dest))
     shutil.copytree(srcs[0], dest)
 
 
 def rename_images(args):
-    imgs = glob.glob(os.path.join(get_img_dir(args), '*.png'))
-    for src in imgs:
-        dest = args.isbn + src[len(args.isbn):]
+    img_dir = get_img_dir(
+        get_staging_dir(args),
+        '{}_{:02}_'.format(args.isbn, args.chapter),
+        )
+    for fn in os.listdir(img_dir):
+        if not fn.endswith('.png'):
+            continue
+        src = os.path.join(img_dir, fn)
+        dest = os.path.join(img_dir, args.isbn + fn[len(args.isbn):])
         print('mv {} {}'.format(src, dest))
         shutil.move(src, dest)
 
