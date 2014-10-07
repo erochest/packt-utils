@@ -26,7 +26,7 @@ IMAGES = os.path.expanduser(os.path.join(
 def copy_chapter(args):
     srcs = glob.glob(os.path.join(
         args.previous,
-        '*_{:02}_FinalDraft*.doc'.format(args.chapter),
+        '*_{:02}_FinalDraft*.doc'.format(args.old_chapter),
         ))
     if not srcs:
         raise Exception(
@@ -45,7 +45,7 @@ def copy_chapter(args):
 def copy_images(args):
     srcs = glob.glob(os.path.join(
         args.images,
-        '*_{:02}_images'.format(args.chapter),
+        '*_{:02}_images'.format(args.old_chapter),
         ))
     if not srcs:
         raise Exception(
@@ -68,7 +68,10 @@ def rename_images(args):
         if not fn.endswith('.png'):
             continue
         src = os.path.join(img_dir, fn)
-        dest = os.path.join(img_dir, args.isbn + fn[len(args.isbn):])
+        (_, _, n) = fn.split('_')
+        dest = os.path.join(
+            img_dir, '_'.join((args.isbn, str(args.chapter), n)),
+            )
         print('mv {} {}'.format(src, dest))
         shutil.move(src, dest)
 
@@ -85,6 +88,10 @@ def parse_args(argv=None):
 
     add_arguments(parser)
 
+    parser.add_argument('-C', '--old-chapter', action='store', default=None,
+                        type=int,
+                        help="The number of the chapter in the previous book, "
+                             "if it's different than the current.")
     parser.add_argument('-p', '--previous', action='store', default=PREVIOUS,
                         type=str,
                         help='The location of the files for the previous '
@@ -95,6 +102,8 @@ def parse_args(argv=None):
                              'previous edition. (Default={}.)'.format(IMAGES))
 
     args = parser.parse_args(argv)
+    if args.old_chapter is None:
+        args.old_chapter = args.chapter
     return args
 
 
