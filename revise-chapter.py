@@ -30,7 +30,7 @@ def copy_chapter(args):
         ))
     if not srcs:
         raise Exception(
-            'No previous final drafts for chapter {}.'.format(args.chapter),
+            'No previous final drafts for chapter {}.'.format(args.old_chapter),
             )
 
     dest = os.path.join(
